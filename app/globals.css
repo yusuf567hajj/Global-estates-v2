@@ -326,6 +326,11 @@
 .ge-brand, .ge-list-hero h1, .ge-form-heading h2 { font-family: Georgia, 'Times New Roman', serif; letter-spacing: -.04em; }
 .ge-brand { color: #f2f0e8; font-size: 1.15rem; }
 .ge-list-page nav a:hover, .ge-back-link:hover { color: #62d5aa; }
+.ge-menu-button { display: none; cursor: pointer; border: 1px solid rgba(229,226,211,.16); border-radius: .3rem; padding: .45rem .6rem; color: #f2f0e8; background: transparent; font-size: 1rem; line-height: 1; }
+.ge-menu-button:hover { border-color: #62d5aa; color: #62d5aa; }
+.ge-mobile-menu { display: grid; gap: .2rem; border-top: 1px solid rgba(229,226,211,.1); margin-top: 1rem; padding-top: .75rem; }
+.ge-mobile-menu a { padding: .65rem .2rem; color: rgba(242,240,232,.65); font-size: .78rem; }
+.ge-mobile-menu a:hover { color: #62d5aa; }
 .ge-outline-button, .ge-solid-button, .ge-submit-button, .ge-image-add button { cursor: pointer; border-radius: .3rem; padding: .65rem .9rem; font-size: .72rem; transition: transform .2s ease, background .2s ease, border-color .2s ease; }
 .ge-outline-button { border: 1px solid rgba(213,173,88,.6); color: #d5ad58; }
 .ge-outline-button:hover { border-color: #62d5aa; color: #62d5aa; }
@@ -363,7 +368,7 @@
 .ge-submit-button { width: 100%; margin-top: 1.5rem; background: #62d5aa; color: #0a0a0a; font-weight: 700; }
 .ge-submit-button:hover { background: #82e5c2; transform: translateY(-1px); }
 .ge-progress-line { position: fixed; bottom: 0; left: 0; height: 3px; width: 72%; background: #62d5aa; box-shadow: 0 0 14px rgba(98,213,170,.65); }
-@media (max-width: 700px) { .ge-list-hero { display: block; padding-top: 2.8rem; } .ge-plan-badge { display: inline-block; margin-top: 1.2rem; } .ge-form-grid, .ge-amenity-grid { grid-template-columns: 1fr 1fr; } .ge-outline-button { display: none; } .ge-solid-button { padding: .55rem .65rem; } }
+@media (max-width: 700px) { .ge-list-hero { display: block; padding-top: 2.8rem; } .ge-plan-badge { display: inline-block; margin-top: 1.2rem; } .ge-form-grid, .ge-amenity-grid { grid-template-columns: 1fr 1fr; } .ge-outline-button { display: none; } .ge-solid-button { padding: .55rem .65rem; } .ge-menu-button { display: block; } }
 @media (max-width: 430px) { .ge-form-grid, .ge-amenity-grid { grid-template-columns: 1fr; } }
 
 

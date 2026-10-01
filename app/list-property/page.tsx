@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 
 const amenities = ['Wi-Fi', 'Kitchen', 'Free parking', 'Swimming pool', 'Air conditioning', 'Outdoor space', 'Beach access', 'Scenic views', 'Pet friendly', 'Security', 'Water supply', 'Electricity']
 const countries = ['Kenya', 'Uganda', 'Tanzania', 'Rwanda', 'Nigeria', 'Ghana', 'South Africa', 'United States', 'United Kingdom', 'Canada', 'Australia', 'United Arab Emirates', 'Germany', 'France', 'Italy', 'Spain', 'India']
@@ -10,6 +11,7 @@ export default function ListPropertyPage() {
   const [imageUrl, setImageUrl] = useState('')
   const [images, setImages] = useState<string[]>([])
   const [submitted, setSubmitted] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   function addImage() {
     if (imageUrl.startsWith('https://')) { setImages((current) => [...current, imageUrl]); setImageUrl('') }
@@ -22,7 +24,7 @@ export default function ListPropertyPage() {
 
   return <main className="ge-list-page min-h-screen bg-[#0a0a0a] text-[#f2f0e8]">
     <nav className="border-b border-white/[.08] bg-[#0a0a0a]">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4"><a href="/" className="ge-brand">Global Estates.</a><div className="hidden items-center gap-6 text-xs text-white/50 md:flex"><a href="/">Home</a><a href="/?category=Rent">Rent</a><a href="/?category=Vacation">Vacation</a><a href="/?category=Outings">Outings</a><a href="/?category=Land">Lend</a></div><div className="flex items-center gap-2"><a href="#listing-form" className="ge-outline-button">+ List your property</a><a href="/" className="ge-solid-button">My dashboard</a></div></div>
+      <div className="mx-auto max-w-6xl px-5 py-4"><div className="flex items-center justify-between"><Link href="/" className="ge-brand">Global Estates.</Link><div className="hidden items-center gap-6 text-xs text-white/50 md:flex"><Link href="/">Home</Link><Link href="/?category=Rent">Rent</Link><Link href="/?category=Vacation">Vacation</Link><Link href="/?category=Outings">Outings</Link><Link href="/?category=Land">Land</Link></div><div className="flex items-center gap-2"><a href="#listing-form" className="ge-outline-button">+ List your property</a><Link href="/" className="ge-solid-button">My dashboard</Link><button type="button" aria-label="Toggle navigation menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)} className="ge-menu-button">{menuOpen ? '×' : '☰'}</button></div></div>{menuOpen && <div className="ge-mobile-menu md:hidden"><Link href="/" onClick={() => setMenuOpen(false)}>Home</Link><Link href="/?category=Rent" onClick={() => setMenuOpen(false)}>Rent</Link><Link href="/?category=Vacation" onClick={() => setMenuOpen(false)}>Vacation</Link><Link href="/?category=Outings" onClick={() => setMenuOpen(false)}>Outings</Link><Link href="/?category=Land" onClick={() => setMenuOpen(false)}>Land</Link><a href="#listing-form" onClick={() => setMenuOpen(false)}>+ List your property</a></div>}</div>
     </nav>
     <div className="mx-auto max-w-6xl px-5 pb-20 pt-8"><a href="/" className="ge-back-link">&lt; Back to dashboard</a><header className="ge-list-hero"><div><p className="ge-eyebrow">OPEN YOUR DOORS TO THE WORLD</p><h1>Every place has a story.</h1><p>Tell yours. Create your free property listing.</p></div><span className="ge-plan-badge">Free listing - KSh 0</span></header>
       <form id="listing-form" onSubmit={submit} className="ge-list-form">
