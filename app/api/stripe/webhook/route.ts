@@ -15,7 +15,11 @@ export async function POST(request: Request) {
   if (event.type === 'checkout.session.completed' || event.type === 'checkout.session.async_payment_succeeded') {
     const session = event.data.object as Stripe.Checkout.Session
     if (session.payment_status === 'paid' || event.type === 'checkout.session.async_payment_succeeded') {
-      if (session.metadata?.kind === 'listing' && session.metadata.transactionId) {
+      if (session.metadata?.kind === 'subscription' && session.metadata.transactionId) {
+        await query('UPDATE transactions SET status = $1, stripe_session_id = $2, updated_at = now() WHERE id = $3', ['paid', session.id, session.metadata.transactionId])
+        await query('UPDATE subscriptions SET status = $1, stripe_subscription_id = $2, current_period_end = now() + interval \'1 month\', transaction_id = $3, updated_at = now() WHERE user_id = $4 AND status = $5', ['active', typeof session.subscription === 'string' ? session.subscription : null, session.metadata.transactionId, session.metadata.userId, 'active'])
+        await query('INSERT INTO subscriptions (user_id, plan_id, status, current_period_end, stripe_subscription_id, transaction_id) VALUES ($1,$2,$3,now() + interval \'1 month\',$4,$5) ON CONFLICT (stripe_subscription_id) DO NOTHING', [session.metadata.userId, session.metadata.planId, 'active', typeof session.subscription === 'string' ? session.subscription : null, session.metadata.transactionId])
+      } else if (session.metadata?.kind === 'listing' && session.metadata.transactionId) {
         const promotion = await query<{ duration_days: number }>('SELECT duration_days FROM listing_plans WHERE id = $1 LIMIT 1', [session.metadata.planId])
         const durationDays = Number(promotion.rows[0]?.duration_days || 14)
         await query('UPDATE transactions SET status = $1, stripe_session_id = $2, updated_at = now() WHERE id = $3', ['paid', session.id, session.metadata.transactionId])
