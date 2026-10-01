@@ -30,8 +30,12 @@ export async function POST(request: NextRequest) {
     if (conflicts.rows.length) return NextResponse.json({ error: 'Those dates are no longer available.' }, { status: 409 })
     const nights = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / 86400000))
     const amount = Math.round(Number(listing.price) * nights)
-    const platformFee = ['Vacation', 'Outings'].includes(listing.category) ? Math.round(amount * 0.1) : 0
+    const settings = await query<{ booking_commission: string }>('SELECT booking_commission FROM monetization_settings WHERE id = 1')
+    const commissionRate = Number(settings.rows[0]?.booking_commission ?? 10)
+    const platformFee = ['Vacation', 'Outings'].includes(listing.category) ? Math.round(amount * commissionRate / 100) : 0
     const booking = await query<{ id: string }>('INSERT INTO bookings (property_id, customer_name, customer_email, check_in, check_out, guests, amount, platform_fee, host_payout) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id', [propertyId, customerName, customerEmail, checkIn, checkOut, guests, amount, platformFee, amount - platformFee])
+    const receiptReference = `GE-${Date.now().toString(36).toUpperCase()}`
+    await query('INSERT INTO transactions (booking_id, kind, amount, platform_revenue, currency, status, receipt_reference, metadata) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)', [booking.rows[0].id, 'booking', amount, platformFee, 'KES', 'pending', receiptReference, JSON.stringify({ commissionRate })])
     const origin = request.headers.get('origin') || process.env.V0_RUNTIME_URL || 'http://localhost:3000'
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',

@@ -15,7 +15,9 @@ export async function POST(request: Request) {
   if (event.type === 'checkout.session.completed' || event.type === 'checkout.session.async_payment_succeeded') {
     const session = event.data.object as Stripe.Checkout.Session
     if (session.payment_status === 'paid' || event.type === 'checkout.session.async_payment_succeeded') {
-      await query('UPDATE bookings SET payment_status = $1, payment_intent_id = $2 WHERE id = $3', ['paid', typeof session.payment_intent === 'string' ? session.payment_intent : null, session.metadata?.bookingId ?? ''])
+      const bookingId = session.metadata?.bookingId ?? ''
+      await query('UPDATE bookings SET payment_status = $1, payment_intent_id = $2 WHERE id = $3', ['paid', typeof session.payment_intent === 'string' ? session.payment_intent : null, bookingId])
+      await query('UPDATE transactions SET status = $1, stripe_session_id = $2, updated_at = now() WHERE booking_id = $3 AND status = $4', ['paid', session.id, bookingId, 'pending'])
     }
   }
   if (event.type === 'checkout.session.expired') {
