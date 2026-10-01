@@ -27,14 +27,23 @@ export async function POST(request: Request) {
     }
 
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-').toLowerCase()
-    const blob = await put(`property-images/${crypto.randomUUID()}-${safeName}`, file, {
-      access: 'public',
-      addRandomSuffix: false,
-    })
-
-    return NextResponse.json({ url: blob.url })
+    try {
+      const blob = await put(`property-images/${crypto.randomUUID()}-${safeName}`, file, {
+        access: 'public',
+        addRandomSuffix: false,
+      })
+      return NextResponse.json({ url: blob.url, storage: 'blob' })
+    } catch (error) {
+      console.error('[v0] Blob upload failed, using inline fallback:', error)
+      if (file.size <= 5 * 1024 * 1024) {
+        const bytes = Buffer.from(await file.arrayBuffer())
+        const mime = file.type || 'image/jpeg'
+        return NextResponse.json({ url: `data:${mime};base64,${bytes.toString('base64')}`, storage: 'inline' })
+      }
+      return NextResponse.json({ error: 'Image upload failed. Please use an image smaller than 5 MB.' }, { status: 500 })
+    }
   } catch (error) {
-    console.error('[v0] Blob upload failed:', error)
+    console.error('[v0] Image upload request failed:', error)
     return NextResponse.json({ error: 'Image upload failed.' }, { status: 500 })
   }
 }

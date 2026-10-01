@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     const bedrooms = Number(body.bedrooms)
     const guests = Number(body.guests)
     const amenities = Array.isArray(body.amenities) ? body.amenities.filter((item: unknown): item is string => typeof item === 'string').slice(0, 24) : []
-    const images = Array.isArray(body.images) ? body.images.filter((item: unknown): item is string => typeof item === 'string' && item.startsWith('https://')).slice(0, 12) : []
+    const images = Array.isArray(body.images) ? body.images.filter((item: unknown): item is string => typeof item === 'string' && (item.startsWith('https://') || item.startsWith('data:image/'))).slice(0, 12) : []
 
     if (!title || !location || !country || !description || !Number.isFinite(price) || price < 0 || !Number.isInteger(bedrooms) || bedrooms < 0 || !Number.isInteger(guests) || guests < 1) {
       return NextResponse.json({ error: 'Please complete all required property details.' }, { status: 400 })
