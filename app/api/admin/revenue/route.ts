@@ -14,9 +14,9 @@ export async function GET() {
     ])
     const paidByKind = transactions.rows.filter((row) => row.status === 'paid').reduce((groups, row) => { const kind = String(row.kind || 'other'); groups[kind] = (groups[kind] || 0) + Number(row.platform_revenue || row.amount || 0); return groups }, {} as Record<string, number>)
     const successful = transactions.rows.filter((row) => row.status === 'paid')
-    const total = successful.reduce((sum, row) => sum + Number(row.amount || 0), 0)
+    const total = successful.reduce((sum, row) => sum + Number(row.platform_revenue || 0), 0)
     const today = new Date().toISOString().slice(0, 10)
-    const revenueToday = successful.filter((row) => String(row.created_at).startsWith(today)).reduce((sum, row) => sum + Number(row.amount || 0), 0)
+    const revenueToday = successful.filter((row) => String(row.created_at).startsWith(today)).reduce((sum, row) => sum + Number(row.platform_revenue || 0), 0)
     return NextResponse.json({
       transactions: transactions.rows,
       listingPlans: plans.rows,
