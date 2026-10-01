@@ -204,6 +204,46 @@
 .ge-reference input::placeholder { color: rgba(242, 240, 232, .4); }
 .ge-reference option { background: #151c19; color: #f2f0e8; }
 
+.ge-listing-modal {
+  animation: ge-modal-in .24s ease-out;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(98, 213, 170, .55) transparent;
+}
+
+.ge-listing-modal form {
+  display: grid;
+  gap: 1rem;
+}
+
+.ge-listing-modal form > label,
+.ge-listing-modal form > div {
+  min-width: 0;
+}
+
+.ge-listing-modal textarea {
+  min-height: 118px;
+  resize: vertical;
+}
+
+.ge-listing-modal input:focus,
+.ge-listing-modal select:focus,
+.ge-listing-modal textarea:focus {
+  box-shadow: 0 0 0 3px rgba(98, 213, 170, .13);
+}
+
+@keyframes ge-modal-in {
+  from { opacity: 0; transform: translateY(12px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 640px) {
+  .ge-listing-modal {
+    max-height: 94vh;
+    padding: 1.1rem !important;
+    border-radius: 1.35rem;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
