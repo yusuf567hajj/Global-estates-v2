@@ -208,6 +208,37 @@
   animation: ge-modal-in .24s ease-out;
   scrollbar-width: thin;
   scrollbar-color: rgba(98, 213, 170, .55) transparent;
+  max-width: 880px !important;
+  max-height: 96vh !important;
+  border-radius: 1.1rem !important;
+  background: #0d1411 !important;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, .55);
+}
+
+.ge-listing-modal > div:first-child {
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(229, 226, 211, .12);
+}
+
+.ge-listing-modal > div:first-child::before {
+  content: 'OPEN YOUR DOORS TO THE WORLD';
+  display: block;
+  margin-bottom: .75rem;
+  color: #d5ad58;
+  font-size: .62rem;
+  letter-spacing: .18em;
+}
+
+.ge-listing-modal h2::after {
+  content: 'Every place has a story.';
+  display: block;
+  margin-top: .55rem;
+  color: #f2f0e8;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.6rem, 4vw, 2.35rem);
+  font-weight: 400;
+  letter-spacing: -.04em;
 }
 
 .ge-listing-modal form {
@@ -220,16 +251,54 @@
   min-width: 0;
 }
 
+.ge-listing-modal form > label:first-child::before {
+  content: '01  The essentials';
+  display: block;
+  margin: .25rem 0 1rem;
+  color: #d5ad58;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1rem;
+}
+
 .ge-listing-modal textarea {
-  min-height: 118px;
+  min-height: 132px;
   resize: vertical;
+}
+
+.ge-listing-modal input,
+.ge-listing-modal select,
+.ge-listing-modal textarea {
+  min-height: 44px;
+  border-radius: .35rem !important;
+  background: rgba(255, 255, 255, .045) !important;
+  border-color: rgba(229, 226, 211, .12) !important;
 }
 
 .ge-listing-modal input:focus,
 .ge-listing-modal select:focus,
 .ge-listing-modal textarea:focus {
   box-shadow: 0 0 0 3px rgba(98, 213, 170, .13);
+  border-color: rgba(98, 213, 170, .75) !important;
 }
+
+.ge-listing-modal form > div:last-child {
+  margin-top: .5rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(229, 226, 211, .12);
+}
+
+.ge-listing-modal button[type='submit'] {
+  min-height: 48px;
+  border-radius: .35rem;
+  background: #5ed4a7;
+  color: #0d1210;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .2s ease, background .2s ease;
+}
+
+.ge-listing-modal button[type='submit']:hover { background: #7ae0bc; transform: translateY(-1px); }
+.ge-listing-modal button[type='submit']:disabled { cursor: wait; opacity: .6; transform: none; }
 
 @keyframes ge-modal-in {
   from { opacity: 0; transform: translateY(12px) scale(.985); }
@@ -240,7 +309,7 @@
   .ge-listing-modal {
     max-height: 94vh;
     padding: 1.1rem !important;
-    border-radius: 1.35rem;
+    border-radius: 1.35rem !important;
   }
 }
 
