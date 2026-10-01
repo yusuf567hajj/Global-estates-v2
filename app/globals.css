@@ -153,6 +153,13 @@
   }
 }
 
+.ge-hero {
+  min-height: 520px;
+  background-image: url('https://images.unsplash.com/photo-1505881502353-a1986add3762?auto=format&fit=crop&w=2200&q=88');
+  background-position: center;
+  background-size: cover;
+}
+
 .ge-reference {
   background: #0d1210;
   color: #f2f0e8;
