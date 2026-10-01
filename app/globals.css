@@ -306,7 +306,26 @@
 }
 
 @media (max-width: 640px) {
-  .ge-listing-modal {
+.ge-form-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(229, 226, 211, .12);
+}
+.ge-form-section h3 { margin: 0; color: #f2f0e8; font-family: Georgia, 'Times New Roman', serif; font-size: 1.05rem; font-weight: 400; }
+.ge-section-number { margin: 0; color: #d5ad58; font-family: Georgia, 'Times New Roman', serif; font-size: .95rem; }
+.ge-section-subtitle { margin: .25rem 0 0; color: rgba(242, 240, 232, .45); font-size: .75rem; }
+.ge-amenity-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+.ge-amenity { display: flex; align-items: center; gap: .5rem; padding: .65rem .7rem; border: 1px solid rgba(229, 226, 211, .12); border-radius: .35rem; color: rgba(242, 240, 232, .65); font-size: .75rem; transition: border-color .2s ease, background .2s ease; }
+.ge-amenity:hover { border-color: rgba(98, 213, 170, .7); background: rgba(98, 213, 170, .06); }
+.ge-amenity input { accent-color: #5ed4a7; }
+.ge-upload { display: grid; min-height: 150px; place-items: center; align-content: center; gap: .35rem; border: 1px dashed rgba(229, 226, 211, .24); border-radius: .35rem; color: #d5ad58; text-align: center; }
+.ge-upload strong { color: #f2f0e8; font-size: .8rem; font-weight: 500; }
+.ge-upload small { color: rgba(242, 240, 232, .4); font-size: .7rem; }
+
+.ge-listing-modal {
+
     max-height: 94vh;
     padding: 1.1rem !important;
     border-radius: 1.35rem !important;
