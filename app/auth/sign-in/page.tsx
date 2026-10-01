@@ -11,7 +11,8 @@ export default function SignInPage() {
   async function signInWithGoogle() {
     setLoading(true); setError('')
     try {
-      const result = await authClient.signIn.social({ provider: 'google', callbackURL: '/dashboard' })
+      const callbackURL = `${window.location.origin}/dashboard`
+      const result = await authClient.signIn.social({ provider: 'google', callbackURL, errorCallbackURL: `${window.location.origin}/auth/sign-in?error=google` })
       if (result.error) setError('Google sign-in is not enabled for this project yet.')
     } catch (error) { console.error('[v0] Google sign-in failed:', error); setError('Google sign-in is unavailable right now.') } finally { setLoading(false) }
   }
