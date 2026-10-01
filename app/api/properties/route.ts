@@ -1,47 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { propertiesCollection } from '@/lib/db'
+import { getPropertiesTable, query, serializeProperty } from '@/lib/db'
 
-const categories = ['Rent', 'Vacation', 'Outings', 'Land'] as const
-
-function numberParam(value: string | null) {
-  if (!value) return undefined
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : undefined
-}
-
-function serialize(property: Record<string, unknown>) {
-  return { ...property, id: String(property._id), _id: undefined, createdAt: property.createdAt instanceof Date ? property.createdAt.toISOString() : property.createdAt }
-}
+const categories = ['Rent', 'Vacation', 'Outings', 'Land']
+const num = (value: string | null) => value && Number.isFinite(Number(value)) ? Number(value) : undefined
 
 export async function GET(request: NextRequest) {
   try {
-    const params = request.nextUrl.searchParams
-    const location = params.get('location')?.trim()
-    const country = params.get('country')?.trim()
-    const category = params.get('category')?.trim()
-    const minPrice = numberParam(params.get('minPrice'))
-    const maxPrice = numberParam(params.get('maxPrice'))
-    const bedrooms = numberParam(params.get('bedrooms'))
-    const guests = numberParam(params.get('guests'))
-    const query: Record<string, unknown> = { status: 'published' }
-    if (location) query.$or = [{ location: { $regex: location, $options: 'i' } }, { title: { $regex: location, $options: 'i' } }]
-    if (country && country !== 'All countries') query.country = country
-    if (category && category !== 'All') query.category = category
-    if (minPrice !== undefined || maxPrice !== undefined) query.price = { ...(minPrice !== undefined ? { $gte: minPrice } : {}), ...(maxPrice !== undefined ? { $lte: maxPrice } : {}) }
-    if (bedrooms !== undefined) query.bedrooms = { $gte: bedrooms }
-    if (guests !== undefined) query.guests = { $gte: guests }
-    const sort = params.get('sort') === 'price-asc' ? { price: 1 as const } : params.get('sort') === 'price-desc' ? { price: -1 as const } : { createdAt: -1 as const }
-    const collection = await propertiesCollection()
-    const properties = await collection.find(query).sort(sort).limit(100).toArray()
-    return NextResponse.json({ properties: properties.map((property) => serialize(property as Record<string, unknown>)) })
+    await getPropertiesTable()
+    const p = request.nextUrl.searchParams
+    const where: string[] = ["status = 'published'"]
+    const values: unknown[] = []
+    const add = (sql: string, value: unknown) => { values.push(value); where.push(sql.replace('?', `$${values.length}`)) }
+    const location = p.get('location')?.trim()
+    const country = p.get('country')?.trim()
+    const category = p.get('category')?.trim()
+    if (location) { values.push(`%${location}%`); where.push(`(location ILIKE $${values.length} OR title ILIKE $${values.length})`) }
+    if (country && country !== 'All countries') add('country = ?', country)
+    if (category && category !== 'All') add('category = ?', category)
+    const minPrice = num(p.get('minPrice')); const maxPrice = num(p.get('maxPrice')); const bedrooms = num(p.get('bedrooms')); const guests = num(p.get('guests'))
+    if (minPrice !== undefined) add('price >= ?', minPrice)
+    if (maxPrice !== undefined) add('price <= ?', maxPrice)
+    if (bedrooms !== undefined) add('bedrooms >= ?', bedrooms)
+    if (guests !== undefined) add('guests >= ?', guests)
+    const sort = p.get('sort') === 'price-asc' ? 'price ASC' : p.get('sort') === 'price-desc' ? 'price DESC' : 'created_at DESC'
+    const result = await query(`SELECT id, title, category, location, country, description, price, bedrooms, guests, amenities, images, listing_plan, created_at FROM properties WHERE ${where.join(' AND ')} ORDER BY ${sort} LIMIT 100`, values)
+    return NextResponse.json({ properties: result.rows.map(serializeProperty) })
   } catch (error) {
-    console.error('[v0] properties GET failed', error)
+    console.error('[v0] PostgreSQL properties GET failed', error)
     return NextResponse.json({ error: 'Unable to load properties. Please try again.' }, { status: 500 })
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
+    await getPropertiesTable()
     const body = await request.json()
     const title = typeof body.title === 'string' ? body.title.trim() : ''
     const location = typeof body.location === 'string' ? body.location.trim() : ''
@@ -50,12 +42,10 @@ export async function POST(request: NextRequest) {
     const price = Number(body.price)
     if (!title || !location || !country || !description || !Number.isFinite(price) || price < 0) return NextResponse.json({ error: 'Please complete all required fields.' }, { status: 400 })
     if (!categories.includes(body.category)) return NextResponse.json({ error: 'Invalid category.' }, { status: 400 })
-    const property = { title, category: body.category, location, country, description, price, bedrooms: Math.max(0, Number(body.bedrooms) || 0), guests: Math.max(1, Number(body.guests) || 1), amenities: Array.isArray(body.amenities) ? body.amenities.filter((item: unknown) => typeof item === 'string').slice(0, 30) : [], images: Array.isArray(body.images) ? body.images.filter((item: unknown) => typeof item === 'string').slice(0, 12) : [], listingPlan: body.listingPlan || 'Free', status: 'published', createdAt: new Date() }
-    const collection = await propertiesCollection()
-    const result = await collection.insertOne(property)
-    return NextResponse.json({ property: serialize({ ...property, _id: result.insertedId }) }, { status: 201 })
+    const result = await query(`INSERT INTO properties (title, category, location, country, description, price, bedrooms, guests, amenities, images, listing_plan, status) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'published') RETURNING id, title, category, location, country, description, price, bedrooms, guests, amenities, images, listing_plan, created_at`, [title, body.category, location, country, description, price, Math.max(0, Number(body.bedrooms) || 0), Math.max(1, Number(body.guests) || 1), JSON.stringify(body.amenities || []), JSON.stringify(body.images || []), body.listingPlan || 'Free'])
+    return NextResponse.json({ property: serializeProperty(result.rows[0]) }, { status: 201 })
   } catch (error) {
-    console.error('[v0] properties POST failed', error)
+    console.error('[v0] PostgreSQL properties POST failed', error)
     return NextResponse.json({ error: 'Property could not be saved. Please try again.' }, { status: 500 })
   }
 }
