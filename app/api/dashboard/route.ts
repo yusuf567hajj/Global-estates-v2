@@ -8,14 +8,14 @@ export async function GET() {
     const userId = session.user.id
     await getPropertiesTable()
     const [properties, bookings, leads, transactions, subscriptions] = await Promise.all([
-      query('SELECT * FROM properties ORDER BY created_at DESC'),
-      query('SELECT * FROM bookings ORDER BY created_at DESC'),
+      query('SELECT * FROM properties WHERE host_id = $1 ORDER BY created_at DESC', [userId]),
+      query('SELECT bookings.* FROM bookings JOIN properties ON properties.id = bookings.property_id WHERE properties.host_id = $1 ORDER BY bookings.created_at DESC', [userId]),
       query('SELECT id, property_id, buyer_name, buyer_email, message, status, referral_fee, created_at FROM leads WHERE owner_id = $1 ORDER BY created_at DESC LIMIT 100', [userId]),
       query('SELECT id, kind, amount, platform_revenue, currency, status, receipt_reference, created_at FROM transactions WHERE user_id = $1 ORDER BY created_at DESC LIMIT 100', [userId]),
       query('SELECT id, plan_id, status, current_period_start, current_period_end FROM subscriptions WHERE user_id = $1 ORDER BY created_at DESC LIMIT 20', [userId]),
     ])
     const paid = bookings.rows.filter((row) => row.payment_status === 'paid')
-    const revenue = paid.reduce((sum, row) => sum + Number(row.amount || 0), 0)
+    const revenue = paid.reduce((sum, row) => sum + Number(row.host_payout || 0), 0)
     return NextResponse.json({
       properties: properties.rows.map(serializeProperty),
       bookings: bookings.rows,
