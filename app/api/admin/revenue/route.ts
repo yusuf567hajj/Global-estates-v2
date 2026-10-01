@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server'
 import { query } from '@/lib/db'
+import { requireAdmin } from '@/lib/server-auth'
 
 export async function GET() {
   try {
+    await requireAdmin()
     const [transactions, plans, subscriptions, properties, bookings, settings, featured] = await Promise.all([
       query('SELECT * FROM transactions ORDER BY created_at DESC LIMIT 100'),
       query('SELECT * FROM listing_plans ORDER BY price'),
@@ -31,6 +33,7 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   try {
+    await requireAdmin()
     const body = await request.json()
     if (body.type === 'commission') {
       const commission = Number(body.value)
