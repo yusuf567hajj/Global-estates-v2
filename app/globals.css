@@ -369,7 +369,10 @@
 .ge-eyebrow { color: #d5ad58; font-size: .6rem; letter-spacing: .18em; }
 .ge-list-hero h1 { margin-top: .8rem; color: #f2f0e8; font-size: clamp(2.5rem, 7vw, 4.8rem); font-weight: 400; line-height: .96; }
 .ge-list-hero p:last-child { margin-top: 1rem; color: rgba(242,240,232,.46); font-size: .78rem; }
-.ge-plan-badge { border: 1px solid rgba(213,173,88,.5); border-radius: .25rem; padding: .55rem .75rem; color: #d5ad58; font-size: .65rem; white-space: nowrap; }
+.ge-plan-badge { display: inline-block; border: 1px solid rgba(213,173,88,.5); border-radius: .25rem; padding: .55rem .75rem; color: #d5ad58; font-size: .65rem; white-space: nowrap; }
+.ge-photo-jump { display: block; margin-top: .75rem; color: #4ade80; font-size: .68rem; transition: color .2s ease; }
+.ge-photo-jump:hover { color: #86efac; text-decoration: underline; }
+#photo-upload { scroll-margin-top: 1rem; }
 .ge-list-form { max-width: 900px; padding-top: 2rem; }
 .ge-list-form section { padding: 1.8rem 0 2.3rem; border-bottom: 1px solid rgba(229,226,211,.1); }
 .ge-form-heading { display: flex; gap: 1.1rem; margin-bottom: 1.6rem; }
