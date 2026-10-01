@@ -3,13 +3,16 @@ import { query } from '@/lib/db'
 
 export async function GET() {
   try {
-    const [transactions, plans, subscriptions, properties, bookings] = await Promise.all([
+    const [transactions, plans, subscriptions, properties, bookings, settings, featured] = await Promise.all([
       query('SELECT * FROM transactions ORDER BY created_at DESC LIMIT 100'),
       query('SELECT * FROM listing_plans ORDER BY price'),
       query('SELECT * FROM subscription_plans ORDER BY price'),
       query("SELECT COUNT(*)::int AS count FROM properties WHERE status = 'published'"),
       query('SELECT COUNT(*)::int AS count FROM bookings'),
+      query('SELECT booking_commission FROM monetization_settings WHERE id = 1'),
+      query("SELECT COUNT(*)::int AS count FROM property_promotions WHERE active = true AND ends_at > now()"),
     ])
+    const paidByKind = transactions.rows.filter((row) => row.status === 'paid').reduce((groups, row) => { const kind = String(row.kind || 'other'); groups[kind] = (groups[kind] || 0) + Number(row.platform_revenue || row.amount || 0); return groups }, {} as Record<string, number>)
     const successful = transactions.rows.filter((row) => row.status === 'paid')
     const total = successful.reduce((sum, row) => sum + Number(row.amount || 0), 0)
     const today = new Date().toISOString().slice(0, 10)
@@ -18,7 +21,7 @@ export async function GET() {
       transactions: transactions.rows,
       listingPlans: plans.rows,
       subscriptionPlans: subscriptions.rows,
-      stats: { totalRevenue: total, revenueToday, revenueThisMonth: total, transactions: transactions.rowCount ?? 0, successful: successful.length, failed: transactions.rows.filter((row) => row.status === 'failed').length, pending: transactions.rows.filter((row) => row.status === 'pending').length, featuredProperties: 0, properties: properties.rows[0]?.count ?? 0, bookings: bookings.rows[0]?.count ?? 0 },
+      stats: { totalRevenue: total, revenueToday, revenueThisMonth: total, transactions: transactions.rowCount ?? 0, successful: successful.length, failed: transactions.rows.filter((row) => row.status === 'failed').length, pending: transactions.rows.filter((row) => row.status === 'pending').length, featuredProperties: featured.rows[0]?.count ?? 0, properties: properties.rows[0]?.count ?? 0, bookings: bookings.rows[0]?.count ?? 0, bookingCommissions: paidByKind.booking || 0, listingRevenue: paidByKind.listing || 0, subscriptionRevenue: paidByKind.subscription || 0, referralRevenue: paidByKind.referral || 0, commission: Number(settings.rows[0]?.booking_commission ?? 10) },
     })
   } catch (error) {
     console.error('[v0] admin revenue failed', error)
