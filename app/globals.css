@@ -154,14 +154,24 @@
 }
 
 .ge-reference {
-  background: #f8fafc;
-  color: #151515;
-  background-image: radial-gradient(circle at 50% 18%, rgba(125, 211, 252, .2), transparent 30%), radial-gradient(circle at 85% 70%, rgba(186, 230, 253, .18), transparent 28%);
+  background: #0d1210;
+  color: #f2f0e8;
+  background-image: radial-gradient(circle at 76% 14%, rgba(70, 125, 96, .12), transparent 34%), radial-gradient(circle at 12% 66%, rgba(184, 145, 72, .08), transparent 28%);
+  font-family: Arial, sans-serif;
 }
 
 .ge-reference header {
-  background: rgba(255, 255, 255, .78) !important;
-  border-color: rgba(15, 23, 42, .08) !important;
+  background: rgba(13, 18, 16, .92) !important;
+  border-color: rgba(229, 226, 211, .14) !important;
+}
+
+.ge-reference h1,
+.ge-reference h2,
+.ge-reference h3,
+.ge-reference header span {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  letter-spacing: -.035em;
 }
 
 .ge-reference .text-white\/65,
@@ -171,21 +181,21 @@
 .ge-reference .text-white\/40,
 .ge-reference .text-white\/35,
 .ge-reference .text-white\/70,
-.ge-reference .text-white\/75 { color: rgba(21, 21, 21, .58) !important; }
-.ge-reference .text-white { color: #151515 !important; }
+.ge-reference .text-white\/75 { color: rgba(242, 240, 232, .62) !important; }
+.ge-reference .text-white { color: #f2f0e8 !important; }
 .ge-reference .border-white\/10,
-.ge-reference .border-white\/15 { border-color: rgba(15, 23, 42, .12) !important; }
+.ge-reference .border-white\/15 { border-color: rgba(229, 226, 211, .16) !important; }
 .ge-reference .bg-white\/\[\.06\],
-.ge-reference .bg-black\/20 { background: rgba(255, 255, 255, .72) !important; }
-.ge-reference [class~="bg-[#10201b]"] { background: #ffffff !important; color: #151515 !important; }
-.ge-reference .text-emerald-300 { color: #0ea5e9 !important; }
-.ge-reference .bg-emerald-300 { background: #151515 !important; color: #ffffff !important; }
-.ge-reference .hover\\:bg-emerald-200:hover { background: #333333 !important; }
+.ge-reference .bg-black\/20 { background: rgba(255, 255, 255, .035) !important; }
+.ge-reference [class~="bg-[#10201b]"] { background: #151c19 !important; color: #f2f0e8 !important; }
+.ge-reference .text-emerald-300 { color: #62d5aa !important; }
+.ge-reference .bg-emerald-300 { background: #5ed4a7 !important; color: #0d1210 !important; }
+.ge-reference .hover\\:bg-emerald-200:hover { background: #7ae0bc !important; }
 .ge-reference input,
 .ge-reference select,
-.ge-reference textarea { color: #151515; }
-.ge-reference input::placeholder { color: rgba(21, 21, 21, .4); }
-.ge-reference option { background: #ffffff; color: #151515; }
+.ge-reference textarea { color: #f2f0e8; }
+.ge-reference input::placeholder { color: rgba(242, 240, 232, .4); }
+.ge-reference option { background: #151c19; color: #f2f0e8; }
 
 @layer base {
   * {
