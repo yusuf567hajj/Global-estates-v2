@@ -153,6 +153,40 @@
   }
 }
 
+.ge-reference {
+  background: #f8fafc;
+  color: #151515;
+  background-image: radial-gradient(circle at 50% 18%, rgba(125, 211, 252, .2), transparent 30%), radial-gradient(circle at 85% 70%, rgba(186, 230, 253, .18), transparent 28%);
+}
+
+.ge-reference header {
+  background: rgba(255, 255, 255, .78) !important;
+  border-color: rgba(15, 23, 42, .08) !important;
+}
+
+.ge-reference .text-white\/65,
+.ge-reference .text-white\/60,
+.ge-reference .text-white\/55,
+.ge-reference .text-white\/45,
+.ge-reference .text-white\/40,
+.ge-reference .text-white\/35,
+.ge-reference .text-white\/70,
+.ge-reference .text-white\/75 { color: rgba(21, 21, 21, .58) !important; }
+.ge-reference .text-white { color: #151515 !important; }
+.ge-reference .border-white\/10,
+.ge-reference .border-white\/15 { border-color: rgba(15, 23, 42, .12) !important; }
+.ge-reference .bg-white\/\[\.06\],
+.ge-reference .bg-black\/20 { background: rgba(255, 255, 255, .72) !important; }
+.ge-reference [class~="bg-[#10201b]"] { background: #ffffff !important; color: #151515 !important; }
+.ge-reference .text-emerald-300 { color: #0ea5e9 !important; }
+.ge-reference .bg-emerald-300 { background: #151515 !important; color: #ffffff !important; }
+.ge-reference .hover\\:bg-emerald-200:hover { background: #333333 !important; }
+.ge-reference input,
+.ge-reference select,
+.ge-reference textarea { color: #151515; }
+.ge-reference input::placeholder { color: rgba(21, 21, 21, .4); }
+.ge-reference option { background: #ffffff; color: #151515; }
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

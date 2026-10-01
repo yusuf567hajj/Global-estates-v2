@@ -3,8 +3,8 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
+  title: 'Global Estates | Find Your Place in the World',
+  description: 'Discover homes, stays, outings and land opportunities around the world with Global Estates.',
   generator: 'v0.app',
   icons: {
     icon: [
