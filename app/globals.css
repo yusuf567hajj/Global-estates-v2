@@ -197,7 +197,7 @@
 .ge-reference [class~="bg-[#10201b]"] { background: #151c19 !important; color: #f2f0e8 !important; }
 .ge-reference .text-emerald-300 { color: #62d5aa !important; }
 .ge-reference .bg-emerald-300 { background: #5ed4a7 !important; color: #0d1210 !important; }
-.ge-reference .hover\\:bg-emerald-200:hover { background: #7ae0bc !important; }
+.ge-reference button:hover { background-color: #7ae0bc; }
 .ge-reference input,
 .ge-reference select,
 .ge-reference textarea { color: #f2f0e8; }

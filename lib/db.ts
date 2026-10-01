@@ -23,6 +23,16 @@ export function serializeProperty(row: Record<string, unknown>) {
 }
 
 export async function propertiesTableReady() {
+  await query(`CREATE TABLE IF NOT EXISTS bookings (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(), property_id UUID NOT NULL, customer_name TEXT NOT NULL,
+    customer_email TEXT NOT NULL, check_in DATE NOT NULL, check_out DATE NOT NULL, guests INTEGER NOT NULL,
+    amount NUMERIC NOT NULL, platform_fee NUMERIC NOT NULL DEFAULT 0, host_payout NUMERIC NOT NULL DEFAULT 0,
+    payment_status TEXT NOT NULL DEFAULT 'pending', stripe_session_id TEXT, payment_intent_id TEXT,
+    transfer_id TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  )`)
+  await query('CREATE INDEX IF NOT EXISTS bookings_property_dates_idx ON bookings (property_id, check_in, check_out)')
+  await query('CREATE INDEX IF NOT EXISTS bookings_payment_status_idx ON bookings (payment_status)')
+
   await query(`CREATE TABLE IF NOT EXISTS properties (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(), host_id TEXT, title TEXT NOT NULL, category TEXT NOT NULL,
     location TEXT NOT NULL, country TEXT NOT NULL, description TEXT NOT NULL, price NUMERIC NOT NULL DEFAULT 0,
