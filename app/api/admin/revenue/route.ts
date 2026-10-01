@@ -39,11 +39,17 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ ok: true })
     }
     if (body.type === 'listing-plan') {
-      await query('UPDATE listing_plans SET price = $1, active = $2, updated_at = now() WHERE id = $3', [Number(body.price), Boolean(body.active), String(body.id)])
+      const price = Number(body.price)
+      if (!Number.isFinite(price) || price < 0 || !String(body.id)) return NextResponse.json({ error: 'Invalid listing plan.' }, { status: 400 })
+      await query('UPDATE listing_plans SET price = $1, active = $2, updated_at = now() WHERE id = $3', [price, Boolean(body.active), String(body.id)])
       return NextResponse.json({ ok: true })
     }
     if (body.type === 'subscription-plan') {
-      await query('UPDATE subscription_plans SET price = $1, listing_limit = $2, featured_limit = $3, analytics = $4, active = $5, updated_at = now() WHERE id = $6', [Number(body.price), Number(body.listingLimit), Number(body.featuredLimit), Boolean(body.analytics), Boolean(body.active), String(body.id)])
+      const price = Number(body.price)
+      const listingLimit = Number(body.listingLimit)
+      const featuredLimit = Number(body.featuredLimit)
+      if (![price, listingLimit, featuredLimit].every(Number.isFinite) || price < 0 || listingLimit < 0 || featuredLimit < 0 || !String(body.id)) return NextResponse.json({ error: 'Invalid subscription plan.' }, { status: 400 })
+      await query('UPDATE subscription_plans SET price = $1, listing_limit = $2, featured_limit = $3, analytics = $4, active = $5, updated_at = now() WHERE id = $6', [price, listingLimit, featuredLimit, Boolean(body.analytics), Boolean(body.active), String(body.id)])
       return NextResponse.json({ ok: true })
     }
     return NextResponse.json({ error: 'Unsupported admin update.' }, { status: 400 })
