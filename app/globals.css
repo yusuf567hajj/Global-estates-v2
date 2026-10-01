@@ -391,6 +391,10 @@
 .ge-upload-method { display: grid; gap: .45rem; margin-bottom: .75rem; color: rgba(242,240,232,.62); font-size: .68rem; }
 .ge-upload-method select { width: 100%; border: 1px solid rgba(255,255,255,.1); border-radius: .5rem; background: #121212; padding: .7rem .8rem; color: #fff; outline: none; }
 .ge-upload-method select:focus { border-color: #4ade80; }
+.ge-modal-upload-box { display: grid; min-height: 150px; place-items: center; align-content: center; gap: .35rem; border: 1px dashed rgba(255,255,255,.2); border-radius: .75rem; background: #121212; cursor: pointer; text-align: center; transition: border-color .2s ease, background .2s ease; }
+.ge-modal-upload-box:hover { border-color: #4ade80; background: rgba(74,222,128,.05); }
+.ge-modal-upload-box strong { color: #fff; font-size: .8rem; font-weight: 500; }
+.ge-modal-upload-box small { color: #a3a3a3; font-size: .68rem; }
 .ge-upload-box { display: grid; min-height: 190px; place-items: center; align-content: center; gap: .35rem; border: 1px dashed rgba(255,255,255,.2); border-radius: .75rem; background: #121212; cursor: pointer; text-align: center; transition: border-color .2s ease, background .2s ease; }
 .ge-upload-box:hover { border-color: #4ade80; background: rgba(74,222,128,.05); }
 .ge-image-previews { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .65rem; margin-top: .8rem; }
