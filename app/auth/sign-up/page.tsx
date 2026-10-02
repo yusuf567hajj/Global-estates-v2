@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation'
 import { authClient } from '@/lib/auth-client'
 
 export default function SignUpPage() {
-  const router = useRouter(); const [error, setError] = useState(''); const [loading, setLoading] = useState(false)
-  const googleError = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('error') === 'google'
+  const router = useRouter(); const [error, setError] = useState(''); const [loading, setLoading] = useState(false); const [googleError, setGoogleError] = useState(false)
+  useState(() => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('error') === 'google')
   async function signUpWithGoogle() {
     setLoading(true); setError('')
     try { const callbackURL = `${window.location.origin}/dashboard`; const result = await authClient.signIn.social({ provider: 'google', callbackURL, errorCallbackURL: `${window.location.origin}/auth/sign-up?error=google` }); if (result.error) setError('Google sign-in is not enabled for this project yet.') } catch (error) { console.error('[v0] Google sign-up failed:', error); setError('Google sign-in is unavailable right now.') } finally { setLoading(false) }
