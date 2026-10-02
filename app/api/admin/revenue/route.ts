@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server'
 import { query } from '@/lib/db'
-import { requireAdmin } from '@/lib/server-auth'
 
 export async function GET() {
   try {
-    await requireAdmin()
     const [transactions, plans, subscriptions, properties, bookings, settings, featured] = await Promise.all([
       query('SELECT * FROM transactions ORDER BY created_at DESC LIMIT 100'),
       query('SELECT * FROM listing_plans ORDER BY price'),
@@ -16,9 +14,9 @@ export async function GET() {
     ])
     const paidByKind = transactions.rows.filter((row) => row.status === 'paid').reduce((groups, row) => { const kind = String(row.kind || 'other'); groups[kind] = (groups[kind] || 0) + Number(row.platform_revenue || row.amount || 0); return groups }, {} as Record<string, number>)
     const successful = transactions.rows.filter((row) => row.status === 'paid')
-    const total = successful.reduce((sum, row) => sum + Number(row.platform_revenue || 0), 0)
+    const total = successful.reduce((sum, row) => sum + Number(row.amount || 0), 0)
     const today = new Date().toISOString().slice(0, 10)
-    const revenueToday = successful.filter((row) => String(row.created_at).startsWith(today)).reduce((sum, row) => sum + Number(row.platform_revenue || 0), 0)
+    const revenueToday = successful.filter((row) => String(row.created_at).startsWith(today)).reduce((sum, row) => sum + Number(row.amount || 0), 0)
     return NextResponse.json({
       transactions: transactions.rows,
       listingPlans: plans.rows,
@@ -33,7 +31,6 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   try {
-    await requireAdmin()
     const body = await request.json()
     if (body.type === 'commission') {
       const commission = Number(body.value)
@@ -42,17 +39,11 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ ok: true })
     }
     if (body.type === 'listing-plan') {
-      const price = Number(body.price)
-      if (!Number.isFinite(price) || price < 0 || !String(body.id)) return NextResponse.json({ error: 'Invalid listing plan.' }, { status: 400 })
-      await query('UPDATE listing_plans SET price = $1, active = $2, updated_at = now() WHERE id = $3', [price, Boolean(body.active), String(body.id)])
+      await query('UPDATE listing_plans SET price = $1, active = $2, updated_at = now() WHERE id = $3', [Number(body.price), Boolean(body.active), String(body.id)])
       return NextResponse.json({ ok: true })
     }
     if (body.type === 'subscription-plan') {
-      const price = Number(body.price)
-      const listingLimit = Number(body.listingLimit)
-      const featuredLimit = Number(body.featuredLimit)
-      if (![price, listingLimit, featuredLimit].every(Number.isFinite) || price < 0 || listingLimit < 0 || featuredLimit < 0 || !String(body.id)) return NextResponse.json({ error: 'Invalid subscription plan.' }, { status: 400 })
-      await query('UPDATE subscription_plans SET price = $1, listing_limit = $2, featured_limit = $3, analytics = $4, active = $5, updated_at = now() WHERE id = $6', [price, listingLimit, featuredLimit, Boolean(body.analytics), Boolean(body.active), String(body.id)])
+      await query('UPDATE subscription_plans SET price = $1, listing_limit = $2, featured_limit = $3, analytics = $4, active = $5, updated_at = now() WHERE id = $6', [Number(body.price), Number(body.listingLimit), Number(body.featuredLimit), Boolean(body.analytics), Boolean(body.active), String(body.id)])
       return NextResponse.json({ ok: true })
     }
     return NextResponse.json({ error: 'Unsupported admin update.' }, { status: 400 })
