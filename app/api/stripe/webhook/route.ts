@@ -27,8 +27,13 @@ export async function POST(request: Request) {
         await query('UPDATE properties SET listing_plan = $1 WHERE id = $2', [session.metadata.planId, session.metadata.propertyId])
       } else {
         const bookingId = session.metadata?.bookingId ?? ''
-        await query('UPDATE bookings SET payment_status = $1, payment_intent_id = $2 WHERE id = $3', ['paid', typeof session.payment_intent === 'string' ? session.payment_intent : null, bookingId])
-        await query('UPDATE transactions SET status = $1, stripe_session_id = $2, updated_at = now() WHERE booking_id = $3 AND status = $4', ['paid', session.id, bookingId, 'pending'])
+        const booking = await query<{ id: string; property_id: string; host_id: string; host_payout: string; payout_eligible_at: string }>('SELECT b.id, b.property_id, p.host_id, b.host_payout, b.payout_eligible_at FROM bookings b JOIN properties p ON p.id = b.property_id WHERE b.id = $1 LIMIT 1', [bookingId])
+        if (booking.rows[0]) {
+          await query('UPDATE bookings SET payment_status = $1, status = $2, payment_intent_id = $3, updated_at = now() WHERE id = $4 AND status = $5', ['paid', 'confirmed', typeof session.payment_intent === 'string' ? session.payment_intent : null, bookingId, 'pending_payment'])
+          await query('UPDATE transactions SET status = $1, stripe_session_id = $2, updated_at = now() WHERE booking_id = $3 AND status = $4', ['paid', session.id, bookingId, 'pending'])
+          await query('INSERT INTO payouts (booking_id, owner_id, amount, status, eligible_at) VALUES ($1,$2,$3,\'pending\',$4) ON CONFLICT DO NOTHING', [bookingId, booking.rows[0].host_id, booking.rows[0].host_payout, booking.rows[0].payout_eligible_at])
+          await query('INSERT INTO booking_financial_events (booking_id, event_type, amount, metadata) SELECT $1, $2, host_payout, jsonb_build_object(\'stripeSessionId\',$3) FROM bookings WHERE id = $1 AND status = \'confirmed\' AND NOT EXISTS (SELECT 1 FROM booking_financial_events WHERE booking_id = $1 AND event_type = \'payment_successful\')', [bookingId, 'payment_successful', session.id])
+        }
       }
     }
   }
