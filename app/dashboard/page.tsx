@@ -14,7 +14,7 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('My properties')
   const [notice, setNotice] = useState('')
   const { data } = useSWR('/api/dashboard', fetcher)
-  const { data: session } = authClient.useSession()
+  const { data: session, isPending: sessionPending } = authClient.useSession()
   const [promoting, setPromoting] = useState<string | null>(null)
   const startSubscription = async () => {
     const planId = window.prompt('Choose subscription: basic, pro, or agency', 'basic')
@@ -43,6 +43,7 @@ export default function DashboardPage() {
   const transactions = data?.transactions ?? []
   const subscriptions = data?.subscriptions ?? []
   const action = (message: string) => { setNotice(message); window.setTimeout(() => setNotice(''), 2600) }
+  if (sessionPending) return <main className="grid min-h-screen place-items-center bg-[#0a0a0a] px-6 text-white"><div className="text-center"><p className="ge-dashboard-eyebrow">OWNER SPACE</p><p className="mt-3 text-sm text-neutral-400">Loading your dashboard…</p></div></main>
   if (!session) return <main className="grid min-h-screen place-items-center bg-[#0a0a0a] px-6 text-white"><div className="max-w-md text-center"><p className="ge-dashboard-eyebrow">YOUR OWNER SPACE</p><h1 className="mt-3 font-serif text-4xl">Sign in to manage your listings.</h1><p className="mt-4 text-sm text-neutral-400">Create an owner account to save properties, view bookings, and manage payouts.</p><div className="mt-8 flex justify-center gap-3"><Link href="/auth/sign-in" className="ge-dashboard-primary">Sign in</Link><Link href="/auth/sign-up" className="ge-dashboard-outline">Sign up</Link></div></div></main>
   return <main className="ge-dashboard min-h-screen bg-[#0a0a0a] text-white">
     <nav className="border-b border-white/10"><div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5"><Link href="/" className="ge-dashboard-brand">Global Estates.</Link><div className="hidden items-center gap-7 text-xs text-neutral-400 md:flex"><Link href="/">Home</Link><Link href="/?category=Rent">Rent</Link><Link href="/?category=Vacation">Vacation</Link><Link href="/?category=Outings">Outings</Link><Link href="/?category=Land">Lend</Link></div><div className="flex items-center gap-2"><Link href="/list-property" className="ge-dashboard-outline"><Plus size={14}/> List your property</Link><span className="ge-dashboard-avatar">M</span></div></div></nav>
