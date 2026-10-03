@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server'
-import { query } from '@/lib/db'
+import { getPropertiesTable, query } from '@/lib/db'
+import { requireSession } from '@/lib/server-auth'
 
 export async function GET() {
   try {
+    await requireSession()
+    await getPropertiesTable()
     const [transactions, plans, subscriptions, properties, bookings, settings, featured] = await Promise.all([
       query('SELECT * FROM transactions ORDER BY created_at DESC LIMIT 100'),
       query('SELECT * FROM listing_plans ORDER BY price'),
@@ -24,6 +27,7 @@ export async function GET() {
       stats: { totalRevenue: total, revenueToday, revenueThisMonth: total, transactions: transactions.rowCount ?? 0, successful: successful.length, failed: transactions.rows.filter((row) => row.status === 'failed').length, pending: transactions.rows.filter((row) => row.status === 'pending').length, featuredProperties: featured.rows[0]?.count ?? 0, properties: properties.rows[0]?.count ?? 0, bookings: bookings.rows[0]?.count ?? 0, bookingCommissions: paidByKind.booking || 0, listingRevenue: paidByKind.listing || 0, subscriptionRevenue: paidByKind.subscription || 0, referralRevenue: paidByKind.referral || 0, commission: Number(settings.rows[0]?.booking_commission ?? 10) },
     })
   } catch (error) {
+    if (error instanceof Error && error.message === 'Unauthorized') return NextResponse.json({ error: 'Login required.' }, { status: 401 })
     console.error('[v0] admin revenue failed', error)
     return NextResponse.json({ error: 'Unable to load admin revenue.' }, { status: 500 })
   }
@@ -31,6 +35,7 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   try {
+    await requireSession()
     const body = await request.json()
     if (body.type === 'commission') {
       const commission = Number(body.value)
@@ -48,6 +53,7 @@ export async function PATCH(request: Request) {
     }
     return NextResponse.json({ error: 'Unsupported admin update.' }, { status: 400 })
   } catch (error) {
+    if (error instanceof Error && error.message === 'Unauthorized') return NextResponse.json({ error: 'Login required.' }, { status: 401 })
     console.error('[v0] admin update failed', error)
     return NextResponse.json({ error: 'Unable to save admin settings.' }, { status: 500 })
   }
