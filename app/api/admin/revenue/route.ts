@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
 import { getPropertiesTable, query } from '@/lib/db'
-import { requireSession } from '@/lib/server-auth'
+import { requireAdmin } from '@/lib/server-auth'
 
 export async function GET() {
   try {
-    await requireSession()
+    await requireAdmin()
     await getPropertiesTable()
     const [transactions, plans, subscriptions, properties, bookings, settings, featured] = await Promise.all([
       query('SELECT id, kind, amount, platform_revenue, currency, status, receipt_reference, created_at FROM transactions ORDER BY created_at DESC LIMIT 100'),
@@ -30,6 +30,7 @@ export async function GET() {
     })
   } catch (error) {
     if (error instanceof Error && error.message === 'Unauthorized') return NextResponse.json({ error: 'Login required.' }, { status: 401 })
+    if (error instanceof Error && error.message === 'Forbidden') return NextResponse.json({ error: 'Admin access required.' }, { status: 403 })
     console.error('[v0] admin revenue failed', error)
     return NextResponse.json({ error: 'Unable to load admin revenue.' }, { status: 500 })
   }
@@ -37,7 +38,7 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   try {
-    await requireSession()
+    await requireAdmin()
     const body = await request.json()
     if (body.type === 'commission') {
       const commission = Number(body.value)
@@ -62,6 +63,7 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: 'Unsupported admin update.' }, { status: 400 })
   } catch (error) {
     if (error instanceof Error && error.message === 'Unauthorized') return NextResponse.json({ error: 'Login required.' }, { status: 401 })
+    if (error instanceof Error && error.message === 'Forbidden') return NextResponse.json({ error: 'Admin access required.' }, { status: 403 })
     console.error('[v0] admin update failed', error)
     return NextResponse.json({ error: 'Unable to save admin settings.' }, { status: 500 })
   }
