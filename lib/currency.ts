@@ -1,0 +1,10 @@
+export const countryCurrency: Record<string, { code: string; symbol: string; locale: string }> = {
+  KE: { code: 'KES', symbol: 'KSh', locale: 'en-KE' }, UG: { code: 'UGX', symbol: 'USh', locale: 'en-UG' }, TZ: { code: 'TZS', symbol: 'TSh', locale: 'sw-TZ' }, RW: { code: 'RWF', symbol: 'RF', locale: 'rw-RW' }, NG: { code: 'NGN', symbol: '₦', locale: 'en-NG' }, GH: { code: 'GHS', symbol: 'GH₵', locale: 'en-GH' }, ZA: { code: 'ZAR', symbol: 'R', locale: 'en-ZA' }, US: { code: 'USD', symbol: '$', locale: 'en-US' }, GB: { code: 'GBP', symbol: '£', locale: 'en-GB' }, CA: { code: 'CAD', symbol: 'CA$', locale: 'en-CA' }, AU: { code: 'AUD', symbol: 'A$', locale: 'en-AU' }, AE: { code: 'AED', symbol: 'د.إ', locale: 'ar-AE' }, DE: { code: 'EUR', symbol: '€', locale: 'de-DE' }, FR: { code: 'EUR', symbol: '€', locale: 'fr-FR' }, IT: { code: 'EUR', symbol: '€', locale: 'it-IT' }, ES: { code: 'EUR', symbol: '€', locale: 'es-ES' }, IN: { code: 'INR', symbol: '₹', locale: 'en-IN' },
+}
+
+export const countryCodes: Record<string, string> = { Kenya: 'KE', Uganda: 'UG', Tanzania: 'TZ', Rwanda: 'RW', Nigeria: 'NG', Ghana: 'GH', 'South Africa': 'ZA', 'United States': 'US', 'United Kingdom': 'GB', Canada: 'CA', Australia: 'AU', 'United Arab Emirates': 'AE', Germany: 'DE', France: 'FR', Italy: 'IT', Spain: 'ES', India: 'IN' }
+
+export function getCurrency(countryOrCode = 'KE') { return countryCurrency[countryCodes[countryOrCode] || countryOrCode] || countryCurrency.KE }
+export function formatPrice(value: number, countryOrCode = 'KE') { const currency = getCurrency(countryOrCode); return new Intl.NumberFormat(currency.locale, { style: 'currency', currency: currency.code, maximumFractionDigits: 0 }).format(Number(value) || 0) }
+export function countryFromCode(code = 'KE') { return Object.entries(countryCodes).find(([, value]) => value === code)?.[0] || 'Kenya' }
+export function getCountryFromBrowser() { const region = Intl.DateTimeFormat().resolvedOptions().locale.split('-')[1]?.toUpperCase(); return region && countryCurrency[region] ? region : 'KE' }
