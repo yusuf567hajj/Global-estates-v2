@@ -40,6 +40,7 @@ export async function propertiesTableReady() {
     images JSONB NOT NULL DEFAULT '[]', listing_plan TEXT NOT NULL DEFAULT 'Free', status TEXT NOT NULL DEFAULT 'published',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   )`)
+  await query('ALTER TABLE properties ADD COLUMN IF NOT EXISTS currency TEXT NOT NULL DEFAULT \'KES\', ADD COLUMN IF NOT EXISTS views INTEGER NOT NULL DEFAULT 0, ADD COLUMN IF NOT EXISTS bathrooms INTEGER NOT NULL DEFAULT 0, ADD COLUMN IF NOT EXISTS size NUMERIC, ADD COLUMN IF NOT EXISTS size_unit TEXT, ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ')
   await query('CREATE INDEX IF NOT EXISTS properties_discovery_idx ON properties (status, category, country, created_at DESC)')
   await query('CREATE INDEX IF NOT EXISTS properties_price_idx ON properties (price)')
   const count = await query<{ count: string }>('SELECT COUNT(*)::text AS count FROM properties')

@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPropertiesTable, query, serializeProperty } from '@/lib/db'
 
-const categories = ['Rent', 'Vacation', 'Outings', 'Land']
+const categories = ['Rent', 'Vacation', 'Outings', 'Land', 'Buy Property']
 const num = (value: string | null) => value && Number.isFinite(Number(value)) ? Number(value) : undefined
 
 export async function GET(request: NextRequest) {
   try {
     await getPropertiesTable()
     const p = request.nextUrl.searchParams
-    const where: string[] = ["status = 'published'"]
+    const where: string[] = ["status = 'published'", 'deleted_at IS NULL']
     const values: unknown[] = []
     const add = (sql: string, value: unknown) => { values.push(value); where.push(sql.replace('?', `$${values.length}`)) }
     const location = p.get('location')?.trim()
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     if (maxPrice !== undefined) add('price <= ?', maxPrice)
     if (bedrooms !== undefined) add('bedrooms >= ?', bedrooms)
     if (guests !== undefined) add('guests >= ?', guests)
-    const sort = p.get('sort') === 'price-asc' ? 'price ASC' : p.get('sort') === 'price-desc' ? 'price DESC' : 'created_at DESC'
+    const sort = p.get('sort') === 'price-asc' ? 'price ASC' : p.get('sort') === 'price-desc' ? 'price DESC' : p.get('sort') === 'most-viewed' ? 'views DESC NULLS LAST, created_at DESC' : 'CASE listing_plan WHEN \'Top Placement\' THEN 0 WHEN \'Premium\' THEN 1 WHEN \'Featured\' THEN 2 ELSE 3 END, created_at DESC'
     const result = await query(`SELECT id, title, category, location, country, description, price, bedrooms, guests, amenities, images, listing_plan, created_at FROM properties WHERE ${where.join(' AND ')} ORDER BY ${sort} LIMIT 100`, values)
     return NextResponse.json({ properties: result.rows.map(serializeProperty) })
   } catch (error) {
