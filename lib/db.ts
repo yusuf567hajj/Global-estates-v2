@@ -32,6 +32,8 @@ export async function propertiesTableReady() {
   )`)
   await query('CREATE INDEX IF NOT EXISTS bookings_property_dates_idx ON bookings (property_id, check_in, check_out)')
   await query('CREATE INDEX IF NOT EXISTS bookings_payment_status_idx ON bookings (payment_status)')
+  await query(`CREATE TABLE IF NOT EXISTS reviews (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), booking_id UUID NOT NULL, property_id UUID NOT NULL, reviewer_id TEXT NOT NULL, rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5), review_text TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'published', created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), UNIQUE (booking_id, reviewer_id))`)
+  await query('CREATE INDEX IF NOT EXISTS reviews_property_idx ON reviews (property_id, status, created_at DESC)')
 
   await query(`CREATE TABLE IF NOT EXISTS properties (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(), host_id TEXT, title TEXT NOT NULL, category TEXT NOT NULL,

@@ -22,7 +22,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     const { id } = await params
     const result = await query(
       `SELECT id, title, category, location, country, description, price, bedrooms, guests, amenities, images, listing_plan, status, created_at
-       FROM properties WHERE id = $1 AND status = 'published' LIMIT 1`,
+       FROM properties WHERE id = $1 AND status = 'published' AND deleted_at IS NULL LIMIT 1`,
       [id],
     )
     if (!result.rows[0]) return NextResponse.json({ error: 'Property not found.' }, { status: 404 })
